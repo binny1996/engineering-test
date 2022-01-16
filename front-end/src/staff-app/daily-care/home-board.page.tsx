@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Ref } from "react"
+import React, { useState, useEffect, useRef, Ref, useContext } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -11,11 +11,13 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 import Sorter from "staff-app/components/solutions/sorter.component"
 import Search from "staff-app/components/solutions/search.component"
+import MainContext from "staff-app/components/solutions/maincontext"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" });
   const [theStudents, setTheStudents] = useState<Person[]>();
+  const appContext = useContext(MainContext)
 
   useEffect(() => {
     void getStudents()
@@ -23,6 +25,11 @@ export const HomeBoardPage: React.FC = () => {
 
   useEffect(function(){
     setTheStudents(data?.students);
+    let dataWithRolls = data?.students.map(function(item){
+      item.roll_state = "unmark" 
+      return item;
+    }) || [];
+    appContext?.setStudentsFilter(dataWithRolls.slice())
   },[loadState])
 
   const onToolbarAction = (action: ToolbarAction) => {
