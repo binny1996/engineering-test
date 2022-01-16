@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useContext } from "react"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { RollStateIcon } from "staff-app/components/roll-state/roll-state-icon.component"
 import { Spacing, FontWeight } from "shared/styles/styles"
 import { RolllStateType } from "shared/models/roll"
+import MainContext from "../solutions/maincontext"
 
 interface Props {
   stateList: StateList[]
@@ -11,10 +12,24 @@ interface Props {
   size?: number
 }
 export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick }) => {
-  const onClick = (type: ItemType) => {
-    if (onItemClick) {
-      onItemClick(type)
+  const appContext = useContext(MainContext)
+  // const onClick = (type: ItemType) => {
+  //   if (onItemClick) {
+  //     onItemClick(type)
+  //   }
+  // }
+
+  function setStateFilter(type:string){
+    let filter;
+    switch(type){
+      case "all":
+        filter = appContext?.allData
+        break;
+      default:
+        filter = appContext?.allData.filter(x=>x.roll_state===type)
+        break;  
     }
+    appContext?.setStudentsFilter(filter?.slice());
   }
 
   return (
@@ -23,7 +38,7 @@ export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemCli
         if (s.type === "all") {
           return (
             <S.ListItem key={i}>
-              <FontAwesomeIcon icon="users" size="sm" style={{ cursor: "pointer" }} onClick={() => onClick(s.type)} />
+              <FontAwesomeIcon icon="users" size="sm" style={{ cursor: "pointer" }} onClick={() => setStateFilter(s.type)} />
               <span>{s.count}</span>
             </S.ListItem>
           )
@@ -31,7 +46,7 @@ export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemCli
 
         return (
           <S.ListItem key={i}>
-            <RollStateIcon type={s.type} size={size} onClick={() => onClick(s.type)} />
+            <RollStateIcon type={s.type} size={size} onClick={() => setStateFilter(s.type)} />
             <span>{s.count}</span>
           </S.ListItem>
         )

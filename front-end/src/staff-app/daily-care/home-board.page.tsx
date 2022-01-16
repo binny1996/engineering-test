@@ -30,6 +30,7 @@ export const HomeBoardPage: React.FC = () => {
       return item;
     }) || [];
     appContext?.setStudentsFilter(dataWithRolls.slice())
+    appContext?.setAllData(dataWithRolls.slice())
   },[loadState])
 
   const onToolbarAction = (action: ToolbarAction) => {
@@ -57,7 +58,7 @@ export const HomeBoardPage: React.FC = () => {
 
         {loadState === "loaded" && data?.students && (
           <>
-            {theStudents?.map((s) => (
+            {appContext?.studentsFilter?.map((s) => (
               <StudentListTile key={s.id} isRollMode={isRollMode} student={s} />
             ))}
           </>

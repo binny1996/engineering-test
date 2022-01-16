@@ -13,10 +13,13 @@ type GlobalContext = {
 
 function App() {
   const [studentsFilter, setStudentsFilter] = React.useState([]);
+  const [allData, setAllData] = React.useState([]);
 
   const context = {
     studentsFilter: studentsFilter,
-    setStudentsFilter: setStudentsFilter
+    setStudentsFilter: setStudentsFilter,
+    allData: allData,
+    setAllData: setAllData
   };
   return (
     <>

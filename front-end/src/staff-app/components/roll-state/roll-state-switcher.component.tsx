@@ -38,8 +38,8 @@ export const RollStateSwitcher: React.FC<Props> = ({ initialState = "unmark", si
         item.roll_state = next
       }
     })
-    console.log(allStudents);
     appContext?.setStudentsFilter(allStudents?.slice());
+    appContext?.setAllData(allStudents?.slice());
 
     if (onStateChange) {
       onStateChange(next)
