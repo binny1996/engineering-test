@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef, Ref } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -9,14 +9,21 @@ import { Person } from "shared/models/person"
 import { useApi } from "shared/hooks/use-api"
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
+import Sorter from "staff-app/components/solutions/sorter.component"
+import Search from "staff-app/components/solutions/search.component"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
-  const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" });
+  const [theStudents, setTheStudents] = useState<Person[]>();
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
+
+  useEffect(function(){
+    setTheStudents(data?.students);
+  },[loadState])
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
@@ -33,7 +40,7 @@ export const HomeBoardPage: React.FC = () => {
   return (
     <>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} />
+        <Toolbar onItemClick={onToolbarAction} allData={data?.students} data={theStudents} setData={setTheStudents}/>
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -43,7 +50,7 @@ export const HomeBoardPage: React.FC = () => {
 
         {loadState === "loaded" && data?.students && (
           <>
-            {data.students.map((s) => (
+            {theStudents?.map((s) => (
               <StudentListTile key={s.id} isRollMode={isRollMode} student={s} />
             ))}
           </>
@@ -62,14 +69,19 @@ export const HomeBoardPage: React.FC = () => {
 
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
-  onItemClick: (action: ToolbarAction, value?: string) => void
+  onItemClick: (action: ToolbarAction, value?: string) => void,
+  data: Person[] | undefined,
+  setData: Function,
+  allData: Person[] | undefined
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
   const { onItemClick } = props
   return (
     <S.ToolbarContainer>
-      <div onClick={() => onItemClick("sort")}>First Name</div>
-      <div>Search</div>
+      {/* <div onClick={() => onItemClick("sort")}>First Name</div> */}
+      <Sorter allData={props?.allData} data={props.data} setData={props.setData}/>
+      {/* <div>Search</div> */}
+      <Search allData={props?.allData} data={props.data} setData={props.setData}/>
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
