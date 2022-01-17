@@ -51,8 +51,8 @@ export default function Search(props:PropsType) {
     if(props?.setData === undefined){
       return;
     }
-    let searchArrayFN = props?.allData?.filter(x => x.first_name.toLowerCase().search(q)===0) || [];
-    let searchArrayLN = props?.allData?.filter(x => x.last_name.toLowerCase().search(q)===0) || [];
+    let searchArrayFN = props?.allData?.filter(x => (x.first_name+' '+x.last_name).toLowerCase().search(q)===0) || [];
+    let searchArrayLN = props?.allData?.filter(x => (x.last_name+ ' '+x.first_name).toLowerCase().search(q)===0) || [];
     let matchArrayFN = props?.allData?.filter(x => x.first_name.toLowerCase().match(q)) || [];
     let matchArrayLN = props?.allData?.filter(x => x.last_name.toLowerCase().match(q)) || [];
     let output = [...searchArrayFN, ...searchArrayLN];

@@ -16,9 +16,7 @@ import MainContext from "staff-app/components/solutions/maincontext"
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
-  const [saveRoll, rollData, rollLoadState] = useApi<{}>({ url: "save-roll" })
-  const [activities, actData, actLoad] = useApi<{}>({ url: "get-activities" })
-  // const [theStudents, setTheStudents] = useState<Person[]>();
+  const [saveRoll] = useApi<{}>({ url: "save-roll" })
   const appContext = useContext(MainContext)
 
   useEffect(() => {
@@ -27,34 +25,16 @@ export const HomeBoardPage: React.FC = () => {
 
   useEffect(
     function () {
-      // setTheStudents(data?.students);
       let dataWithRolls =
         data?.students.map(function (item) {
           item.roll_state = "unmark"
           return item
         }) || []
-      appContext?.setStudentsFilter(dataWithRolls.slice())
+      appContext?.setStudentsFilter(dataWithRolls.slice().sort((a, b) => (a.first_name > b.first_name ? 1 : -1)))
       appContext?.setAllData(dataWithRolls.slice())
-      // let student_roll_states:Array<object> = []
-      // dataWithRolls.map(function(item){
-      //   student_roll_states.push({
-      //     student_id: item.id,
-      //     roll_state: item.roll_state
-      // })
-      // })
-      // saveRoll({student_roll_states})
     },
     [loadState]
   )
-
-  useEffect(function(){
-    console.log(rollData);
-    activities()
-  },[rollLoadState])
-
-  useEffect(function(){
-    console.log(actData);
-  },[actLoad])
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
@@ -130,7 +110,7 @@ const S = {
   PageContainer: styled.div`
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 70%;
     margin: ${Spacing.u4} auto 140px;
   `,
   ToolbarContainer: styled.div`
