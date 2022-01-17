@@ -6,7 +6,7 @@ import { Person } from "shared/models/person"
 
 type PropsType = {
   data: Person[] | undefined,
-  setData: Function,
+  setData: Function | undefined,
   allData: Person[] | undefined
 }
 
@@ -16,6 +16,9 @@ export default function Search(props:PropsType) {
   const btn = useRef<HTMLSpanElement>(null);
 
   function showSearch() {
+    if(props?.setData === undefined){
+      return;
+    }
     let el = input.current;
     if (el !== null && el?.offsetWidth < 6) {
       el.classList.add("expand");
@@ -45,6 +48,9 @@ export default function Search(props:PropsType) {
   }
 
   function getSearchData(q: string) {
+    if(props?.setData === undefined){
+      return;
+    }
     let searchArrayFN = props?.allData?.filter(x => x.first_name.toLowerCase().search(q)===0) || [];
     let searchArrayLN = props?.allData?.filter(x => x.last_name.toLowerCase().search(q)===0) || [];
     let matchArrayFN = props?.allData?.filter(x => x.first_name.toLowerCase().match(q)) || [];

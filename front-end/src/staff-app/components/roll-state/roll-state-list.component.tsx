@@ -8,28 +8,26 @@ import MainContext from "../solutions/maincontext"
 
 interface Props {
   stateList: StateList[]
-  onItemClick?: (type: ItemType) => void
   size?: number
+  isClick?: boolean
 }
-export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick }) => {
+export const RollStateList: React.FC<Props> = ({ stateList, size = 14, isClick = true }) => {
   const appContext = useContext(MainContext)
-  // const onClick = (type: ItemType) => {
-  //   if (onItemClick) {
-  //     onItemClick(type)
-  //   }
-  // }
 
-  function setStateFilter(type:string){
-    let filter;
-    switch(type){
+  function setStateFilter(type: string) {
+    if (isClick === false) {
+      return
+    }
+    let filter
+    switch (type) {
       case "all":
         filter = appContext?.allData
-        break;
+        break
       default:
-        filter = appContext?.allData.filter(x=>x.roll_state===type)
-        break;  
+        filter = appContext?.allData.filter((x) => x.roll_state === type)
+        break
     }
-    appContext?.setStudentsFilter(filter?.slice());
+    appContext?.setStudentsFilter(filter?.slice())
   }
 
   return (

@@ -6,7 +6,7 @@ import { Person } from "shared/models/person"
 
 type PropsType = {
   data: Person[] | undefined,
-  setData: Function,
+  setData: Function | undefined,
   allData: Person[] | undefined
 }
 
@@ -42,6 +42,9 @@ export default function Sorter(props: PropsType) {
     }
     let eventCurrent = ev.currentTarget
     setTimeout(function () {
+      if(props?.setData === undefined){
+        return;
+      }
       let output = doSort(eventCurrent)
       props?.setData(output?.slice())
       btn.nextElementSibling?.classList.remove("none")

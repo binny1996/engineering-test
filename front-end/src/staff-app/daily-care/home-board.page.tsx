@@ -15,23 +15,46 @@ import MainContext from "staff-app/components/solutions/maincontext"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
-  const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" });
-  const [theStudents, setTheStudents] = useState<Person[]>();
+  const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const [saveRoll, rollData, rollLoadState] = useApi<{}>({ url: "save-roll" })
+  const [activities, actData, actLoad] = useApi<{}>({ url: "get-activities" })
+  // const [theStudents, setTheStudents] = useState<Person[]>();
   const appContext = useContext(MainContext)
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
 
+  useEffect(
+    function () {
+      // setTheStudents(data?.students);
+      let dataWithRolls =
+        data?.students.map(function (item) {
+          item.roll_state = "unmark"
+          return item
+        }) || []
+      appContext?.setStudentsFilter(dataWithRolls.slice())
+      appContext?.setAllData(dataWithRolls.slice())
+      // let student_roll_states:Array<object> = []
+      // dataWithRolls.map(function(item){
+      //   student_roll_states.push({
+      //     student_id: item.id,
+      //     roll_state: item.roll_state
+      // })
+      // })
+      // saveRoll({student_roll_states})
+    },
+    [loadState]
+  )
+
   useEffect(function(){
-    setTheStudents(data?.students);
-    let dataWithRolls = data?.students.map(function(item){
-      item.roll_state = "unmark" 
-      return item;
-    }) || [];
-    appContext?.setStudentsFilter(dataWithRolls.slice())
-    appContext?.setAllData(dataWithRolls.slice())
-  },[loadState])
+    console.log(rollData);
+    activities()
+  },[rollLoadState])
+
+  useEffect(function(){
+    console.log(actData);
+  },[actLoad])
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
@@ -40,15 +63,23 @@ export const HomeBoardPage: React.FC = () => {
   }
 
   const onActiveRollAction = (action: ActiveRollAction) => {
-    if (action === "exit") {
-      setIsRollMode(false)
+    if (action === "complete") {
+      let student_roll_states: Array<object> = []
+      appContext?.allData.map(function (item) {
+        student_roll_states.push({
+          student_id: item.id,
+          roll_state: item.roll_state,
+        })
+      })
+      saveRoll({ student_roll_states })
     }
+    setIsRollMode(false)
   }
 
   return (
     <>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} allData={data?.students} data={theStudents} setData={setTheStudents}/>
+        <Toolbar onItemClick={onToolbarAction} allData={appContext?.allData} data={appContext?.studentsFilter} setData={appContext?.setStudentsFilter} />
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -77,9 +108,9 @@ export const HomeBoardPage: React.FC = () => {
 
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
-  onItemClick: (action: ToolbarAction, value?: string) => void,
-  data: Person[] | undefined,
-  setData: Function,
+  onItemClick: (action: ToolbarAction, value?: string) => void
+  data: Person[] | undefined
+  setData: Function | undefined
   allData: Person[] | undefined
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
@@ -87,9 +118,9 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
   return (
     <S.ToolbarContainer>
       {/* <div onClick={() => onItemClick("sort")}>First Name</div> */}
-      <Sorter allData={props?.allData} data={props.data} setData={props.setData}/>
+      <Sorter allData={props?.allData} data={props.data} setData={props.setData} />
       {/* <div>Search</div> */}
-      <Search allData={props?.allData} data={props.data} setData={props.setData}/>
+      <Search allData={props?.allData} data={props.data} setData={props.setData} />
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
